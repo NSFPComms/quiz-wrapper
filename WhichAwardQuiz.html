@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Flexible Quiz</title>
+<style>
+  body { font-family: Arial; background:#f5f5f5; }
+  #container { max-width:700px; margin:auto; background:white; padding:20px; }
+  button { display:block; width:100%; margin:5px 0; padding:10px; }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <h1>Quiz</h1>
+  <div id="quiz"></div>
+  <div id="result" style="display:none;"></div>
+</div>
+
+<script>
+
+// ===== EDIT ONLY THIS BLOCK =====
+const rawData = `
+OUTCOMES:
+Grad Study Abroad
+Professional Opportunity
+UK Grad Study
+English Teaching Abroad
+Domestic Grad Study/Research
+
+DESCRIPTIONS:
+Immersive, globally focused research with cross-cultural collaboration.
+Career-building experiences that prepare you for leadership and industry impact.
+Specialized academic study in the UK with historic and cutting-edge institutions.
+Hands-on cultural exchange through teaching and community engagement abroad.
+Advanced academic work within the U.S. focused on deep research and scholarship.
+
+---
+
+When I imagine myself next fall, I am…
+Chatting over a book in a café in Amsterdam (1,2)
+looking at 500-year-old documents in an Oxford archive (3)
+Playing with Taiwanese kindergartners at recess (4)
+writing a research article at the Library of Congress (5)
+---
+My dream job is…
+conducting research in my field (1)
+working in whatever professional field my heart desires (2)
+serving as an ambassador or FSO (3)
+teaching or working at a university (4,5)
+---
+If you could have a super power, what would it be? 
+Teleportation (1)
+Telepathy (2,4)
+Time Travel (3)
+Freeze Time (5)
+---
+What is your screensaver/lock screen photo?
+Natural Landscapes (1,3)
+Abstract Art (2)
+Something Inspirational (4)
+A Cherished Person/Memory (5)
+---
+Which genre of music is dominating your queue?
+Lo Fi (1,5)
+Movie Soundtracks (2)
+Rock (3)
+Rap/Hip Hop (4)
+---
+If you were in of a band, which role would you play? 
+Keyboard (1)
+Lead Singer (2,4)
+Drummer (3)
+Bass (5)
+---
+What's your go-to coffee order?
+mix it up, fam! What's new on the menu? (1)
+Regular drip coffee (cream and sugar optional) (2,5)
+Black tea with milk (3)
+Matcha latte (4)
+---
+What's your dream vacation spot?
+historical adventure, European castles or Buddhist stupas… (1,3)
+a modern city with museums, restaurants, and all the sites (2)
+a tropical beach, book in one hand, coconut in the other… (4)
+Disneyland, baby! (5)
+---
+What is your preferred creative outlet?
+Playing/Composing Music (1,5)
+Drawing (2)
+Writing (3)
+Dancing (4)
+---
+What's the best place to study?
+A Common Room (1)
+A Cafe/ Coffe shop (2)
+The Library (3,4)
+From the comfort of my dorm (5)
+---
+You're cooking a meal! What are you going for? 
+Depends on the ingredients I have (1)
+Whatever's the quickest (2)
+A new recipe I saw online (3)
+A Family Recipe (4,5)
+---
+You are given the chance to time travel; where and when are you going? 
+I'd go somewhere else and to the future (1)
+I'd stay here and travel to the future (2,5)
+I'd go somewhere else and to the past (3)
+I'd stay here and travel to the past (4)
+---
+Which sounds more like you? 
+"I have a research question I'm excited to investigate" (1,5)
+"I want to build skills and real-world experience before committing to a path" (2)
+"The UK is doing cutting-edge research in my field" (3)
+"I'd like to get outside my comfort zone and try something new" (4)
+---
+Pick one movie to watch…
+Midnight in Paris (you're a romantic and an intellectual and you know it) (1)
+Outsourced (You're ready to show up somewhere new, figure it out as you go, and probably learn a LOT on the way) (2,4)
+The Theory of Everything (Cambridge mystique is a personality type) (3)
+Good Will Hunting (you have a question only you can answer, and you're ready to dig in) (5)
+---
+Which of these afternoon snacks sounds the best?
+A mystery item from a bakery where you couldn't read the sign but pointed confidently (1)
+A very good coffee and something from the nice nearby cafe you've already scoped out (2,5)
+Proper tea and a biscuit, at a specific time, in a specific, non-negotiable mug (3)
+Street food you found by following a crowd (4)
+---
+What do you want people to say about your fellowship year(s) when it's over?
+They connected with international scholars in their field (1)
+They came back ready to lead (2)
+They earned their place at a world-class institution (3,5)
+They built something new (4)
+`;
+// ===============================
+
+
+// Parse logic
+function parseQuiz(text) {
+  const sections = text.split('---').map(s => s.trim()).filter(Boolean);
+
+  // Split outcomes + descriptions section
+  const header = sections[0];
+
+  const outcomesPart = header.split('DESCRIPTIONS:')[0]
+    .replace('OUTCOMES:', '')
+    .trim();
+
+  const descriptionsPart = header.split('DESCRIPTIONS:')[1]
+    .trim();
+
+  const outcomes = outcomesPart.split('\n').map(s => s.trim());
+  const descriptions = descriptionsPart.split('\n').map(s => s.trim());
+
+  const questions = sections.slice(1).map(sec => {
+    const lines = sec.split('\n').map(l => l.trim()).filter(Boolean);
+    const q = lines[0];
+
+    const options = lines.slice(1).map(line => {
+      const match = line.match(/\((.*?)\)$/);
+      const buckets = match[1].split(',').map(n => parseInt(n.trim()) - 1);
+      const text = line.replace(/\(.*?\)$/, '').trim();
+      return { text, buckets };
+    });
+
+    return { q, options };
+  });
+
+  return { outcomes, descriptions, questions };
+}
+
+const data = parseQuiz(rawData);
+
+let scores = Array(data.outcomes.length).fill(0);
+let current = 0;
+
+const quizDiv = document.getElementById('quiz');
+const resultDiv = document.getElementById('result');
+
+function showQuestion() {
+  if (current >= data.questions.length) return showResult();
+
+  const q = data.questions[current];
+  quizDiv.innerHTML = `<h2>${q.q}</h2>`;
+
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.textContent = opt.text;
+
+    btn.onclick = () => {
+      opt.buckets.forEach(b => scores[b]++);
+      current++;
+      showQuestion();
+    };
+
+    quizDiv.appendChild(btn);
+  });
+}
+
+function showResult() {
+  quizDiv.style.display = 'none';
+  resultDiv.style.display = 'block';
+
+  const max = Math.max(...scores);
+
+  let resultsHTML = `<h2>Your result:</h2>`;
+
+  data.outcomes.forEach((outcome, i) => {
+    if (scores[i] === max) {
+      resultsHTML += `
+       <div style="margin-bottom:20px; padding:15px; border:1px solid #ddd; border-radius:8px;">
+          <h3>${outcome}</h3>
+          <p>${data.descriptions[i]}</p>
+        </div>
+      `;
+    }
+  });
+
+  resultDiv.innerHTML = resultsHTML;
+}
+
+showQuestion();
+
+</script>
+</body>
+</html>
