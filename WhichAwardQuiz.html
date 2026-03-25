@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexible Quiz</title>
 <style>
   :root {
@@ -13,10 +14,12 @@
     /* COLORS */
     --bg-color: #f5f7fb;
     --card-color: #ffffff;
-    --primary-color: #2a6f97;
+    --primary-color: #252e2e;
     --option-bg: #f0f4f8;
     --option-hover: #dbeafe;
     --option-text: #222;
+    --progress-bg: #e5e7eb;
+    --progress-fill: #3b82f6;
 
     /* SHAPES */
     --border-radius: 12px;
@@ -26,10 +29,15 @@
     --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
   }
 
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: var(--bg-color);
     margin: 0;
+    padding: 10px;
   }
 
   #container {
@@ -45,11 +53,45 @@
     font-size: var(--title-size);
     text-align: center;
     color: var(--primary-color);
+    margin-bottom: 10px;
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
   }
 
   h2 {
     font-size: var(--question-size);
-    margin-bottom: 20px;
+    margin: 0;
+    flex: 1;
+  }
+
+  .question-counter {
+    font-size: 16px;
+    color: #6b7280;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .progress-container {
+    width: 100%;
+    height: 8px;
+    background: var(--progress-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--progress-fill);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
   }
 
   button {
@@ -63,11 +105,171 @@
     border-radius: var(--option-radius);
     cursor: pointer;
     transition: all 0.2s ease;
+    text-align: left;
   }
 
   button:hover {
     background: var(--option-hover);
     transform: scale(1.02);
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  .result-title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .result-title::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--progress-fill);
+    animation: underlineSlide 1s ease forwards;
+  }
+
+  @keyframes underlineSlide {
+    0% {
+      width: 0;
+      opacity: 1;
+    }
+    70% {
+      width: 100%;
+      opacity: 1;
+    }
+    100% {
+      width: 100%;
+      opacity: 0;
+    }
+  }
+
+  .result-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  }
+
+  .result-card h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
+  .result-card p {
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .other-results-section {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .other-results-title {
+    font-size: 20px;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .other-result-card {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+  }
+
+  .other-result-card h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+
+  .other-result-card p {
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 15px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    :root {
+      --title-size: 26px;
+      --question-size: 20px;
+      --option-size: 16px;
+    }
+
+    #container {
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    .question-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .question-counter {
+      align-self: flex-end;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    .result-card h3 {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --title-size: 22px;
+      --question-size: 18px;
+      --option-size: 15px;
+    }
+
+    body {
+      padding: 5px;
+    }
+
+    #container {
+      padding: 15px;
+      margin: 10px auto;
+    }
+
+    h1 {
+      font-size: 22px;
+    }
+
+    .result-card {
+      padding: 15px;
+    }
+
+    .other-result-card {
+      padding: 12px;
+    }
   }
 </style>
 </head>
@@ -241,11 +443,31 @@ let current = 0;
 const quizDiv = document.getElementById('quiz');
 const resultDiv = document.getElementById('result');
 
+function updateProgress() {
+  const progress = (current / data.questions.length) * 100;
+  const progressBar = document.querySelector('.progress-bar');
+  if (progressBar) {
+    progressBar.style.width = progress + '%';
+  }
+}
+
 function showQuestion() {
   if (current >= data.questions.length) return showResult();
 
   const q = data.questions[current];
-  quizDiv.innerHTML = `<h2>${q.q}</h2>`;
+  const totalQuestions = data.questions.length;
+  
+  quizDiv.innerHTML = `
+    <div class="question-header">
+      <h2>${q.q}</h2>
+      <span class="question-counter">${current + 1}/${totalQuestions}</span>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+  `;
+
+  updateProgress();
 
   q.options.forEach(opt => {
     const btn = document.createElement('button');
@@ -266,19 +488,38 @@ function showResult() {
   resultDiv.style.display = 'block';
 
   const max = Math.max(...scores);
+  const winningIndices = [];
 
-  let resultsHTML = `<h2>Your result:</h2>`;
-
+  let resultsHTML = '<h2 style="text-align: center; margin-bottom: 30px;">Your Result:</h2>';
+  
   data.outcomes.forEach((outcome, i) => {
     if (scores[i] === max) {
+      winningIndices.push(i);
       resultsHTML += `
-       <div style="margin-bottom:20px; padding:15px; border:1px solid #ddd; border-radius:8px;">
-          <h3>${outcome}</h2>
+        <div class="result-card">
+          <h3 class="result-title">${outcome}</h3>
           <p>${data.descriptions[i]}</p>
         </div>
       `;
     }
   });
+
+  // Add "Other Possible Results" section
+  resultsHTML += '<div class="other-results-section">';
+  resultsHTML += '<h3 class="other-results-title">Other Possible Results</h3>';
+  
+  data.outcomes.forEach((outcome, i) => {
+    if (!winningIndices.includes(i)) {
+      resultsHTML += `
+        <div class="other-result-card">
+          <h4>${outcome}</h4>
+          <p>${data.descriptions[i]}</p>
+        </div>
+      `;
+    }
+  });
+  
+  resultsHTML += '</div>';
 
   resultDiv.innerHTML = resultsHTML;
 }
