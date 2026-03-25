@@ -4,9 +4,71 @@
 <meta charset="UTF-8">
 <title>Flexible Quiz</title>
 <style>
-  body { font-family: Arial; background:#f5f5f5; }
-  #container { max-width:700px; margin:auto; background:white; padding:20px; }
-  button { display:block; width:100%; margin:5px 0; padding:10px; }
+  :root {
+    /* TEXT SIZES */
+    --title-size: 32px;
+    --question-size: 22px;
+    --option-size: 18px;
+
+    /* COLORS */
+    --bg-color: #f5f7fb;
+    --card-color: #ffffff;
+    --primary-color: #2a6f97;
+    --option-bg: #f0f4f8;
+    --option-hover: #dbeafe;
+    --option-text: #222;
+
+    /* SHAPES */
+    --border-radius: 12px;
+    --option-radius: 25px;
+
+    /* SHADOW */
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-color);
+    margin: 0;
+  }
+
+  #container {
+    max-width: 750px;
+    margin: 40px auto;
+    background: var(--card-color);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+  }
+
+  h1 {
+    font-size: var(--title-size);
+    text-align: center;
+    color: var(--primary-color);
+  }
+
+  h2 {
+    font-size: var(--question-size);
+    margin-bottom: 20px;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    font-size: var(--option-size);
+    background: var(--option-bg);
+    color: var(--option-text);
+    border: none;
+    border-radius: var(--option-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  button:hover {
+    background: var(--option-hover);
+    transform: scale(1.02);
+  }
 </style>
 </head>
 <body>
